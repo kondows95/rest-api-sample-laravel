@@ -16,3 +16,15 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//Dummy endpoint to make sure you can access from cross origin.
+Route::group([], function () {
+    Route::get('todos', function() {
+        return response()->json(
+            array('data'=> array(
+                array('id'=>1, 'text'=>'test1', 'completed'=>false),
+                array('id'=>2, 'text'=>'test2', 'completed'=>true)
+            ))
+        );
+    });
+});
