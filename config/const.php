@@ -1,4 +1,5 @@
 <?php
+//config('const.SOMETHING_CONSTANT')
 return [
-    'ITEM_LIMIT' => 9
+    'SOMETHING_CONSTANT' => 'sample value'
 ];
