@@ -1,7 +1,6 @@
 ## How to install  
 $ cd [YOUR PROJECT FOLDER]　
-$ git clone  
-https://github.com/kondows95/laravel_spa_backend_template.git laravel  
+$ git clone https://github.com/kondows95/laravel-spa-api-startup-kit.git laravel  
 $ cd laravel  
 
 $ cp .env.example .env  
