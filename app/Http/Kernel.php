@@ -29,6 +29,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middlewareGroups = [
+        'web' => [],
         'api' => [
             'throttle:600,1',
             'bindings',
