@@ -18,6 +18,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group([], function () {
+    Route::get('/', function () {
+        return "This endpoint is no problem.";
+    });
     Route::get('items', 'ItemsController@index');
     Route::post('items', 'ItemsController@store');
     Route::get('categories', 'CategoriesController@index');
