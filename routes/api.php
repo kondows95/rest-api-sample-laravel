@@ -21,8 +21,15 @@ Route::group([], function () {
     Route::get('/', function () {
         return "This endpoint is no problem.";
     });
-    Route::get('items', 'ItemsController@index');
-    Route::post('items', 'ItemsController@store');
-    Route::get('categories', 'CategoriesController@index');
-    Route::post('categories', 'CategoriesController@store');
+    
+    Route::ApiResource(
+        'items', 
+        'ItemsController', 
+        ['except' => ['show', 'create', 'edit']]
+    );
+    Route::ApiResource(
+        'categories', 
+        'CategoriesController', 
+        ['except' => ['show', 'create', 'edit']]
+    );
 });

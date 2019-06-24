@@ -23,4 +23,16 @@ class CategoriesController extends Controller
             Category::create($request->validated())
         );
     }
+
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResource
+    {
+        $category->update($request->validated());
+        return new JsonResource($category);
+    }
+    
+    public function destroy(Request $request, Category $category): Response
+    {
+        $category->delete();
+        return response()->noContent();
+    }
 }
