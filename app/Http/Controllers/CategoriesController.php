@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Category;
-use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
 
 class CategoriesController extends Controller
 {
