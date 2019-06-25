@@ -77,7 +77,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function everyone_can_add_row()
+    public function need_auth_later_but_now_everyone_can_add_row()
     {
         $res = $this->post('/api/categories', [
             'name' => 'category1'
@@ -96,5 +96,14 @@ class CategoryTest extends TestCase
         $this->assertEquals('category1', $json['data']['name']);//2
         $this->assertLessThan(2, time() - strtotime($json['data']['created_at']));//3
         $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//4
+    }
+    
+    /** @test */
+    public function need_auth_later_but_now_everyone_can_destroy_row()
+    {
+        $row = factory(Category::class)->create();
+        $res = $this->json('DELETE', "/api/categories/{$row->id}");
+        $res->assertStatus(204);
+        $this->assertSoftDeleted('categories', $row->toArray());
     }
 }

@@ -82,7 +82,7 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function everyone_can_add_row()
+    public function need_auth_later_but_now_everyone_can_add_row()
     {
         $category = factory(Category::class)->create();
         
