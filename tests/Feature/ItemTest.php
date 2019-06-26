@@ -19,7 +19,7 @@ class ItemTest extends TestCase
         $exps = factory(Item::class, 2)->create(['category_id' => $category->id]);
         
         $now = time();
-        $res = $this->get('/api/items'); 
+        $res = $this->json('GET', '/api/items'); 
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -70,7 +70,7 @@ class ItemTest extends TestCase
         $row3 = factory(Item::class)->create();
        
         
-        $res = $this->get('/api/items'); 
+        $res = $this->json('GET', '/api/items'); 
         $res->assertStatus(200);
         $res->assertJsonCount(2, 'data');
         $res->assertJson([
@@ -86,7 +86,7 @@ class ItemTest extends TestCase
     {
         $category = factory(Category::class)->create();
         
-        $res = $this->post('/api/items', [
+        $res = $this->json('POST', '/api/items', [
             'name' => 'item1',
             'price' => 999,
             'image' => 'item1.png',
