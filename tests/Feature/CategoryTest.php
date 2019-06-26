@@ -16,7 +16,7 @@ class CategoryTest extends TestCase
     {
         $exps = factory(Category::class, 2)->create();
  
-        $res = $this->get('/api/categories'); 
+        $res = $this->json('GET', '/api/categories'); 
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -44,7 +44,7 @@ class CategoryTest extends TestCase
         factory(Category::class)->create(['id' => 1250]);
         factory(Category::class)->create(['id' => 8]);
         factory(Category::class)->create(['id' => 35]);
-        $res = $this->get('/api/categories'); 
+        $res = $this->json('GET', '/api/categories'); 
         $res->assertStatus(200);
         $res->assertJsonCount(3, 'data');
         $res->assertJson([
@@ -65,7 +65,7 @@ class CategoryTest extends TestCase
         $row3 = factory(Category::class)->create();
        
         
-        $res = $this->get('/api/categories'); 
+        $res = $this->json('GET', '/api/categories'); 
         $res->assertStatus(200);
         $res->assertJsonCount(2, 'data');
         $res->assertJson([
@@ -79,7 +79,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function need_auth_later_but_now_everyone_can_add_row()
     {
-        $res = $this->post('/api/categories', [
+        $res = $this->json('POST', '/api/categories', [
             'name' => 'category1'
         ]);
         $res->assertStatus(201);
