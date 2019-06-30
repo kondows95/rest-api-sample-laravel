@@ -44,7 +44,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function rows_are_order_by_id_asc()
+    public function categories_are_order_by_id_asc()
     {
         factory(Category::class)->create(['id' => 1250]);
         factory(Category::class)->create(['id' => 8]);
@@ -62,7 +62,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function deleted_rows_are_not_shown()
+    public function deleted_categories_are_not_shown()
     {
         $row1 = factory(Category::class)->create();
         $row2 = factory(Category::class)->create();

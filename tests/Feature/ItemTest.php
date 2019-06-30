@@ -13,7 +13,7 @@ class ItemTest extends TestCase
     use RefreshDatabase;
     
     /** @test */
-    public function everyone_can_get_rows()
+    public function everyone_can_index_items()
     {
         $category =  factory(Category::class)->create();
         $exps = factory(Item::class, 2)->create(['category_id' => $category->id]);
@@ -62,7 +62,25 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function deleted_rows_are_not_shown()
+    public function items_are_order_by_id_asc()
+    {
+        factory(Item::class)->create(['id' => 1250]);
+        factory(Item::class)->create(['id' => 8]);
+        factory(Item::class)->create(['id' => 35]);
+        $res = $this->json('GET', '/api/items'); 
+        $res->assertStatus(200);
+        $res->assertJsonCount(3, 'data');
+        $res->assertJson([
+            'data' => [
+                ['id' => 8],
+                ['id' => 35],
+                ['id' => 1250],
+            ]
+        ]);
+    }
+    
+    /** @test */
+    public function deleted_items_are_not_shown()
     {
         $row1 = factory(Item::class)->create();
         $row2 = factory(Item::class)->create();
