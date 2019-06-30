@@ -12,8 +12,12 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
     
+    //=========================================================================
+    // index
+    //=========================================================================
+    
     /** @test */
-    public function everyone_can_get_categories()
+    public function everyone_can_index_categories()
     {
         $exps = factory(Category::class, 2)->create();
  
@@ -76,6 +80,54 @@ class CategoryTest extends TestCase
             ]
         ]);
     }
+    
+    //=========================================================================
+    // show
+    //=========================================================================
+    
+    /** @test */
+    public function everyone_can_show_category()
+    {
+        $exps = factory(Category::class, 3)->create();
+        
+        $res = $this->json('GET', '/api/categories/'.$exps[1]->id); 
+        $res->assertStatus(200); 
+        $res->assertExactJson([
+            'data' => [
+                'id' => $exps[1]->id,
+                'name' => $exps[1]->name,
+                'created_at' => $this->toMySqlDateFromJson($exps[1]->updated_at),
+                'updated_at' => $this->toMySqlDateFromJson($exps[1]->created_at),
+                'deleted_at' => null,
+            ]
+        ]);
+    }
+    
+    /** @test */
+    public function show_with_id_that_does_not_exist_will_occur_error()
+    {
+        $row = factory(Category::class)->create();
+        $row->delete();
+        
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$row->id);
+        $res = $this->json('GET', '/api/categories/'.$row->id); 
+    }
+    
+    /** @test */
+    public function show_with_deleted_id_will_occur_error()
+    {
+        $row = factory(Category::class)->create();
+        $errorId = $row->id + 1;
+        
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$errorId);
+        $res = $this->json('GET', '/api/categories/'.$errorId); 
+    }
+    
+    //=========================================================================
+    // store
+    //=========================================================================
     
     /**
      * @test 
@@ -148,6 +200,10 @@ class CategoryTest extends TestCase
         $json = $res->json();
         $this->assertEquals(255, strlen($json['data']['name']));
     }
+    
+    //=========================================================================
+    // destroy
+    //=========================================================================
     
     /**
      * @test 
