@@ -7,12 +7,13 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Category;
 
+
 class CategoryTest extends TestCase
 {
     use RefreshDatabase;
     
     /** @test */
-    public function everyone_can_get_rows()
+    public function everyone_can_get_categories()
     {
         $exps = factory(Category::class, 2)->create();
  
@@ -76,8 +77,11 @@ class CategoryTest extends TestCase
         ]);
     }
     
-    /** @test */
-    public function need_auth_later_but_now_everyone_can_add_row()
+    /**
+     * @test 
+     * Actually, you shuould add auth for store method.
+     */
+    public function everyone_can_store_category()
     {
         $res = $this->json('POST', '/api/categories', [
             'name' => 'category1'
@@ -99,7 +103,57 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function need_auth_later_but_now_everyone_can_destroy_row()
+    public function name_length_0_will_occur_validation_error()
+    {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectExceptionMessage('The given data was invalid.');
+        $res = $this->json('POST', '/api/categories', [
+            'name' => ''
+        ]);
+    }
+    
+    /** @test */
+    public function name_length_1_will_no_validation_error()
+    {
+        $res = $this->json('POST', '/api/categories', [
+            'name' => '1'
+        ]);
+        $res->assertStatus(201); 
+    }
+    
+    /** @test */
+    public function name_length_256_will_occur_validation_error()
+    {
+        //first, confirm strlen is 256
+        $str = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDEF';
+        $this->assertEquals(256, strlen($str));
+        
+        //then, confirm exception is occured
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectExceptionMessage('The given data was invalid.');
+        $res = $this->json('POST', '/api/categories', [
+            'name' => $str
+        ]);
+    }
+    
+    /** @test */
+    public function name_length_255_will_no_validation_error()
+    {
+        $res = $this->json('POST', '/api/categories', [
+            'name' => '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDE'
+        ]);
+        $res->assertStatus(201); 
+        
+        //Confirm that the string is not truncated due to DB constraints.
+        $json = $res->json();
+        $this->assertEquals(255, strlen($json['data']['name']));
+    }
+    
+    /**
+     * @test 
+     * Actually, you shuould add auth for destroy method.
+     */
+    public function everyone_can_destroy_category()
     {
         $row = factory(Category::class)->create();
         $res = $this->json('DELETE', "/api/categories/{$row->id}");
