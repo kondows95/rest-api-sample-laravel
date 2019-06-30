@@ -12,8 +12,13 @@ class ItemTest extends TestCase
 {
     use RefreshDatabase;
     
+    //=========================================================================
+    // index
+    // TODL: write test for limit and offset
+    //=========================================================================
+    
     /** @test */
-    public function everyone_can_index_items()
+    public function on_index_items_success()
     {
         $category =  factory(Category::class)->create();
         $exps = factory(Item::class, 2)->create(['category_id' => $category->id]);
@@ -99,8 +104,18 @@ class ItemTest extends TestCase
         ]);
     }
     
+    //=========================================================================
+    // show
+    // TODO: write test
+    //=========================================================================
+    
+    //=========================================================================
+    // store
+    // TODO: write test for validation
+    //=========================================================================
+    
     /** @test */
-    public function need_auth_later_but_now_everyone_can_add_row()
+    public function on_store_item_success()
     {
         $category = factory(Category::class)->create();
         
@@ -131,4 +146,16 @@ class ItemTest extends TestCase
         $this->assertLessThan(2, time() - strtotime($json['data']['created_at']));//6
         $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//7
     }
+    
+    
+    
+    //=========================================================================
+    // update
+    // TODO: write test
+    //=========================================================================
+    
+    //=========================================================================
+    // destroy
+    // TODO: write test
+    //=========================================================================
 }
