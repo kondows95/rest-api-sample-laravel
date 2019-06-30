@@ -19,6 +19,11 @@ class ItemsController extends Controller
             ->get()
         );
     }
+    
+    public function show(Item $item): JsonResource
+    {
+        return new JsonResource($item);
+    }
 
     public function store(StoreItemRequest $request)
     {

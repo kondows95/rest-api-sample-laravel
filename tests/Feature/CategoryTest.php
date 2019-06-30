@@ -158,6 +158,6 @@ class CategoryTest extends TestCase
         $row = factory(Category::class)->create();
         $res = $this->json('DELETE', "/api/categories/{$row->id}");
         $res->assertStatus(204);
-        $this->assertSoftDeleted('categories', $row->toArray());
+        $this->assertSoftDeleted('categories', ['id' => $row->id]);
     }
 }

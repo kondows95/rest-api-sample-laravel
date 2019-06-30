@@ -25,11 +25,11 @@ Route::group([], function () {
     Route::apiResource(
         'items', 
         'ItemsController', 
-        ['except' => ['show', 'create', 'edit']]
+        ['except' => ['create', 'edit']]
     );
     Route::apiResource(
         'categories', 
         'CategoriesController', 
-        ['except' => ['show', 'create', 'edit']]
+        ['except' => ['create', 'edit']]
     );
 });
