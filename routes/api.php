@@ -22,12 +22,12 @@ Route::group([], function () {
         return "This endpoint is no problem.";
     });
     
-    Route::ApiResource(
+    Route::apiResource(
         'items', 
         'ItemsController', 
         ['except' => ['show', 'create', 'edit']]
     );
-    Route::ApiResource(
+    Route::apiResource(
         'categories', 
         'CategoriesController', 
         ['except' => ['show', 'create', 'edit']]
