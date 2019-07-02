@@ -6,14 +6,18 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 
 class CategoryTest extends TestCase
 {
+    use RefreshDatabase;
+    
+    const API_PATH = '/api/categories';
     const STR255 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDE';
     const STR256 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDEF';
     
-    use RefreshDatabase;
     
     //=========================================================================
     // index
@@ -24,7 +28,7 @@ class CategoryTest extends TestCase
     {
         $exps = factory(Category::class, 2)->create();
  
-        $res = $this->json('GET', '/api/categories'); 
+        $res = $this->json('GET', self::API_PATH); 
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -52,7 +56,7 @@ class CategoryTest extends TestCase
         factory(Category::class)->create(['id' => 1250]);
         factory(Category::class)->create(['id' => 8]);
         factory(Category::class)->create(['id' => 35]);
-        $res = $this->json('GET', '/api/categories'); 
+        $res = $this->json('GET', self::API_PATH); 
         $res->assertStatus(200);
         $res->assertJsonCount(3, 'data');
         $res->assertJson([
@@ -73,7 +77,7 @@ class CategoryTest extends TestCase
         $row3 = factory(Category::class)->create();
        
         
-        $res = $this->json('GET', '/api/categories'); 
+        $res = $this->json('GET', self::API_PATH); 
         $res->assertStatus(200);
         $res->assertJsonCount(2, 'data');
         $res->assertJson([
@@ -92,7 +96,7 @@ class CategoryTest extends TestCase
     {
         $exps = factory(Category::class, 3)->create();
         
-        $res = $this->json('GET', '/api/categories/'.$exps[1]->id); 
+        $res = $this->json('GET', self::API_PATH.'/'.$exps[1]->id); 
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -106,25 +110,25 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function show_with_id_that_does_not_exist_will_occur_error()
+    public function show_notExistsId_will_occur_error()
     {
         $row = factory(Category::class)->create();
         $row->delete();
         
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$row->id);
-        $res = $this->json('GET', '/api/categories/'.$row->id); 
+        $res = $this->json('GET', self::API_PATH.'/'.$row->id); 
     }
     
     /** @test */
-    public function show_with_deleted_id_will_occur_error()
+    public function show_deletedId_will_occur_error()
     {
         $row = factory(Category::class)->create();
         $errorId = $row->id + 1;
         
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$errorId);
-        $res = $this->json('GET', '/api/categories/'.$errorId); 
+        $res = $this->json('GET', self::API_PATH.'/'.$errorId); 
     }
     
     //=========================================================================
@@ -134,7 +138,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function on_store_category_success()
     {
-        $res = $this->json('POST', '/api/categories', [
+        $res = $this->json('POST', self::API_PATH, [
             'name' => 'category1'
         ]);
         $res->assertStatus(201);
@@ -154,40 +158,47 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function stored_name_length_0_will_occur_validation_error()
+    public function store_without_postData_will_occur_validation_error()
     {
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $res = $this->json('POST', '/api/categories', [
+        $this->expectException(ValidationException::class);
+        $res = $this->json('POST', self::API_PATH);
+    }
+    
+    /** @test */
+    public function store_name_length_0_will_occur_validation_error()
+    {
+        $this->expectException(ValidationException::class);
+        $res = $this->json('POST', self::API_PATH, [
             'name' => ''
         ]);
     }
     
     /** @test */
-    public function stored_name_length_1_will_no_validation_error()
+    public function store_name_length_1_will_no_validation_error()
     {
-        $res = $this->json('POST', '/api/categories', [
+        $res = $this->json('POST', self::API_PATH, [
             'name' => '1'
         ]);
         $res->assertStatus(201); 
     }
     
     /** @test */
-    public function stored_name_length_256_will_occur_validation_error()
+    public function store_name_length_256_will_occur_validation_error()
     {
         //first, confirm strlen is 256
         $this->assertEquals(256, strlen(self::STR256));
         
         //then, confirm exception is occured
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $res = $this->json('POST', '/api/categories', [
+        $this->expectException(ValidationException::class);
+        $res = $this->json('POST', self::API_PATH, [
             'name' => self::STR256
         ]);
     }
     
     /** @test */
-    public function stored_name_length_255_will_no_validation_error()
+    public function store_name_length_255_will_no_validation_error()
     {
-        $res = $this->json('POST', '/api/categories', [
+        $res = $this->json('POST', self::API_PATH, [
             'name' => self::STR255
         ]);
         $res->assertStatus(201); 
@@ -207,7 +218,7 @@ class CategoryTest extends TestCase
     public function on_update_category_success()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', '/api/categories/'.$row->id, [
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => 'editedCategory'
         ]);
         $res->assertStatus(200);
@@ -232,7 +243,7 @@ class CategoryTest extends TestCase
     public function updated_name_length_1_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', '/api/categories/'.$row->id, [
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => '1'
         ]);
         $res->assertStatus(200); 
@@ -245,9 +256,9 @@ class CategoryTest extends TestCase
         $this->assertEquals(256, strlen(self::STR256));
         
         //then, confirm exception is occured
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', '/api/categories/'.$row->id, [
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => self::STR256
         ]);
     }
@@ -256,7 +267,7 @@ class CategoryTest extends TestCase
     public function updated_name_length_255_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', '/api/categories/'.$row->id, [
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => self::STR255
         ]);
         $res->assertStatus(200); 
@@ -275,7 +286,7 @@ class CategoryTest extends TestCase
     public function on_destory_category_success()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('DELETE', '/api/categories/'.$row->id);
+        $res = $this->json('DELETE', self::API_PATH.'/'.$row->id);
         $res->assertStatus(204);
         $this->assertSoftDeleted('categories', ['id' => $row->id]);
     }

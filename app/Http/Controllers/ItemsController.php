@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Http\Requests\Item\StoreItemRequest;
 use App\Http\Requests\Item\IndexItemsRequest;
 use App\Http\Requests\Item\UpdateItemRequest;
+use Illuminate\Http\Response;
 
 class ItemsController extends Controller
 {
@@ -21,8 +22,10 @@ class ItemsController extends Controller
         );
     }
     
-    public function show(Item $item): JsonResource
+    public function show(int $id): JsonResource
     {
+        // I did not use "Route Model Binding", to join category table.
+        $item = Item::with('category')->findOrFail($id);
         return new JsonResource($item);
     }
 
