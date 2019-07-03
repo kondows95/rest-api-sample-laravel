@@ -133,6 +133,7 @@ class CategoryTest extends TestCase
     
     //=========================================================================
     // store
+    // Actually, you shuould add auth for store method.
     //=========================================================================
     
     /** @test */
@@ -210,11 +211,10 @@ class CategoryTest extends TestCase
     
     //=========================================================================
     // update
+    // Actually, you shuould add auth for store method.
     //=========================================================================
-    /**
-     * @test 
-     * Actually, you shuould add auth for store method.
-     */
+    
+    /** @test */
     public function on_update_category_success()
     {
         $row = factory(Category::class)->create();
@@ -240,7 +240,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function updated_name_length_1_will_no_validation_error()
+    public function update_name_length_1_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
         $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
@@ -250,7 +250,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function updated_name_length_256_will_occur_validation_error()
+    public function update_name_length_256_will_occur_validation_error()
     {
         //first, confirm strlen is 256
         $this->assertEquals(256, strlen(self::STR256));
@@ -264,7 +264,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function updated_name_length_255_will_no_validation_error()
+    public function update_name_length_255_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
         $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [

@@ -19,6 +19,50 @@ class ItemTest extends TestCase
     const STR255 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDE';
     const STR256 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDEF';
     
+
+    
+    //=========================================================================
+    // update
+    // TODO: Write test for validation.
+    // Actually, you shuould add auth for store / update method.
+    //=========================================================================
+    
+    /** @test */
+    public function on_update_item_success()
+    {
+        $categories =  factory(Category::class, 2)->create();
+        $row = factory(Item::class)->create(['category_id' => $categories[0]->id]);
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'editedItem',
+            'price' => 1234,
+            'image' => 'editedItem.png',
+            'category_id' => $categories[1]->id
+        ]);
+        $res->assertStatus(200);
+        $res->assertJsonCount(8, 'data');
+        $res->assertJsonStructure([
+            'data' => [
+                'id',
+                'name',
+                'price',
+                'image',
+                'category_id',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            ]
+        ]);
+        $json = $res->json();//1 is id
+        $this->assertEquals('editedItem', $json['data']['name']);//2
+        $this->assertEquals(1234, $json['data']['price']);//3
+        $this->assertEquals('editedItem.png', $json['data']['image']);//4
+        $this->assertEquals($categories[1]->id, $json['data']['category_id']);//5
+        $this->assertLessThan(2, time() - strtotime($json['data']['created_at']));//6
+        $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//7
+        $this->assertEquals(null, $json['data']['deleted_at']);//8
+    }
+    
+    
     
     //=========================================================================
     // index
@@ -232,6 +276,7 @@ class ItemTest extends TestCase
     
     //=========================================================================
     // store
+    // Actually, you shuould add auth for store / update method.
     //=========================================================================
     
     /** @test */
@@ -267,7 +312,7 @@ class ItemTest extends TestCase
         $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//7
     }
     
-     /** @test */
+    /** @test */
     public function store_without_postData_will_occur_validation_error()
     {
         $this->expectException(ValidationException::class);
@@ -432,11 +477,6 @@ class ItemTest extends TestCase
         ]);
         $res->assertStatus(201); 
     }
-    
-    //=========================================================================
-    // update
-    // TODO: write test
-    //=========================================================================
     
     //=========================================================================
     // destroy

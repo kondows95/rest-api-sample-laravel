@@ -14,6 +14,8 @@ class ItemsController extends Controller
 {
     public function index(IndexItemsRequest $request): ResourceCollection
     {
+        //Here, I joined as a sample, but I think it is better to not join on the API side.
+        //Because I think that API should be simple.
         return JsonResource::collection(
             Item::with('category')->orderBy('id')
             ->limit(config('const.ITEM_LIMIT'))
