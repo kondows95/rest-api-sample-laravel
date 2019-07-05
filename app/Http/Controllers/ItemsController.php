@@ -7,27 +7,26 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Http\Requests\Item\StoreItemRequest;
 use App\Http\Requests\Item\IndexItemsRequest;
-use App\Http\Requests\Item\UpdateItemRequest;
 use Illuminate\Http\Response;
 
 class ItemsController extends Controller
 {
     public function index(IndexItemsRequest $request): ResourceCollection
     {
-        //Here, I joined as a sample, but I think it is better to not join on the API side.
+        //You can join with category table as following".
+        //Item::with('category')->orderBy('id')
+        //But, I think it is better to not join on the API side.
         //Because I think that API should be simple.
         return JsonResource::collection(
-            Item::with('category')->orderBy('id')
+            Item::orderBy('id')
             ->limit(config('const.ITEM_LIMIT'))
             ->offset($request->offset)
             ->get()
         );
     }
     
-    public function show(int $id): JsonResource
+    public function show(Item $item): JsonResource
     {
-        // I did not use "Route Model Binding", to join category table.
-        $item = Item::with('category')->findOrFail($id);
         return new JsonResource($item);
     }
 
@@ -38,7 +37,10 @@ class ItemsController extends Controller
         );
     }
     
-    public function update(UpdateItemRequest $request, Item $item): JsonResource
+    //I do not create UpdateItemRequest but use StoreItemRequest.
+    //In most cases, I think store and update requests should be the same.
+    //However, if there are items that can not be changed, you need to create UpdateItemRequest.
+    public function update(StoreItemRequest $request, Item $item): JsonResource
     {
         $item->update($request->validated());
         return new JsonResource($item);

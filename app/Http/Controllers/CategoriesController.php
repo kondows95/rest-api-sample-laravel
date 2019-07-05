@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Category;
 use App\Http\Requests\Category\StoreCategoryRequest;
-use App\Http\Requests\Category\UpdateCategoryRequest;
 use Illuminate\Http\Response;
 
 class CategoriesController extends Controller
@@ -31,7 +30,7 @@ class CategoriesController extends Controller
         );
     }
 
-    public function update(UpdateCategoryRequest $request, Category $category): JsonResource
+    public function update(StoreCategoryRequest $request, Category $category): JsonResource
     {
         $category->update($request->validated());
         return new JsonResource($category);

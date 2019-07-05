@@ -19,50 +19,6 @@ class ItemTest extends TestCase
     const STR255 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDE';
     const STR256 = '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789ABCDEF';
     
-
-    
-    //=========================================================================
-    // update
-    // TODO: Write test for validation.
-    // Actually, you shuould add auth for store / update method.
-    //=========================================================================
-    
-    /** @test */
-    public function on_update_item_success()
-    {
-        $categories =  factory(Category::class, 2)->create();
-        $row = factory(Item::class)->create(['category_id' => $categories[0]->id]);
-        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
-            'name' => 'editedItem',
-            'price' => 1234,
-            'image' => 'editedItem.png',
-            'category_id' => $categories[1]->id
-        ]);
-        $res->assertStatus(200);
-        $res->assertJsonCount(8, 'data');
-        $res->assertJsonStructure([
-            'data' => [
-                'id',
-                'name',
-                'price',
-                'image',
-                'category_id',
-                'created_at',
-                'updated_at',
-                'deleted_at'
-            ]
-        ]);
-        $json = $res->json();//1 is id
-        $this->assertEquals('editedItem', $json['data']['name']);//2
-        $this->assertEquals(1234, $json['data']['price']);//3
-        $this->assertEquals('editedItem.png', $json['data']['image']);//4
-        $this->assertEquals($categories[1]->id, $json['data']['category_id']);//5
-        $this->assertLessThan(2, time() - strtotime($json['data']['created_at']));//6
-        $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//7
-        $this->assertEquals(null, $json['data']['deleted_at']);//8
-    }
-    
-    
     
     //=========================================================================
     // index
@@ -87,14 +43,7 @@ class ItemTest extends TestCase
                     'category_id' => $category->id,
                     'deleted_at' => NULL,
                     'created_at' => $this->toMySqlDateFromJson($exps[0]->updated_at),
-                    'updated_at' => $this->toMySqlDateFromJson($exps[0]->created_at),
-                    'category' => [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                        'created_at' => $this->toMySqlDateFromJson($category->updated_at),
-                        'updated_at' => $this->toMySqlDateFromJson($category->created_at),
-                        'deleted_at' => null,
-                    ]
+                    'updated_at' => $this->toMySqlDateFromJson($exps[0]->created_at)
                 ],
                 [
                     'id' => $exps[1]->id,
@@ -104,14 +53,7 @@ class ItemTest extends TestCase
                     'category_id' => $category->id,
                     'deleted_at' => NULL,
                     'created_at' => $this->toMySqlDateFromJson($exps[1]->updated_at),
-                    'updated_at' => $this->toMySqlDateFromJson($exps[1]->created_at),
-                    'category' => [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                        'created_at' => $this->toMySqlDateFromJson($category->updated_at),
-                        'updated_at' => $this->toMySqlDateFromJson($category->created_at),
-                        'deleted_at' => null,
-                    ]
+                    'updated_at' => $this->toMySqlDateFromJson($exps[1]->created_at)
                 ],
             ]
         ]);
@@ -239,14 +181,7 @@ class ItemTest extends TestCase
                 'category_id' => $category->id,
                 'deleted_at' => NULL,
                 'created_at' => $this->toMySqlDateFromJson($exps[1]->updated_at),
-                'updated_at' => $this->toMySqlDateFromJson($exps[1]->created_at),
-                'category' => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'created_at' => $this->toMySqlDateFromJson($category->updated_at),
-                    'updated_at' => $this->toMySqlDateFromJson($category->created_at),
-                    'deleted_at' => null,
-                ]
+                'updated_at' => $this->toMySqlDateFromJson($exps[1]->created_at)
             ]
         ]);
     }
@@ -476,6 +411,228 @@ class ItemTest extends TestCase
             'category_id' => $category->id
         ]);
         $res->assertStatus(201); 
+    }
+    
+    //=========================================================================
+    // update
+    // If update's request parameter is the same as store, the validation test will be the same as store.
+    // However, you can not omit the update test.
+    // The store and update tests appear to be duplicates, but because the endpoints are different, you must also test the update.
+    // Also actually, you shuould add auth for store / update method.
+    //=========================================================================
+    
+    /** @test */
+    public function on_update_item_success()
+    {
+        $categories =  factory(Category::class, 2)->create();
+        $row = factory(Item::class)->create(['category_id' => $categories[0]->id]);
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'editedItem',
+            'price' => 1234,
+            'image' => 'editedItem.png',
+            'category_id' => $categories[1]->id
+        ]);
+        $res->assertStatus(200);
+        $res->assertJsonCount(8, 'data');
+        $res->assertJsonStructure([
+            'data' => [
+                'id',
+                'name',
+                'price',
+                'image',
+                'category_id',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            ]
+        ]);
+        $json = $res->json();//1 is id
+        $this->assertEquals('editedItem', $json['data']['name']);//2
+        $this->assertEquals(1234, $json['data']['price']);//3
+        $this->assertEquals('editedItem.png', $json['data']['image']);//4
+        $this->assertEquals($categories[1]->id, $json['data']['category_id']);//5
+        $this->assertLessThan(2, time() - strtotime($json['data']['created_at']));//6
+        $this->assertLessThan(2, time() - strtotime($json['data']['updated_at']));//7
+        $this->assertEquals(null, $json['data']['deleted_at']);//8
+    }
+    
+    /** @test */
+    public function update_without_postData_will_occur_validation_error()
+    {
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id);
+    }
+    
+    
+    /** @test */
+    public function update_noParentCategoryId_will_occur_database_error()
+    {
+        $this->expectException(QueryException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 999,
+            'image' => 'item1.png',
+            'category_id' => 1 //there is no categories
+        ]);
+    }
+    
+    /** @test */
+    public function update_name_length_0_will_occur_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => '',
+            'price' => 999,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+        ]);
+    }
+    
+    /** @test */
+    public function update_name_length_1_will_no_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => '1',
+            'price' => 999,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+            
+        ]);
+        $res->assertStatus(200); 
+    }
+    
+    /** @test */
+    public function update_name_length_256_will_occur_validation_error()
+    {
+        //first, confirm strlen is 256
+        $this->assertEquals(256, strlen(self::STR256));
+        
+        //then, confirm exception is occured
+        $category =  factory(Category::class)->create();
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => self::STR256,
+            'price' => 999,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+        ]);
+    }
+    
+    /** @test */
+    public function update_name_length_255_will_no_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => self::STR255,
+            'price' => 999,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+        ]);
+        $res->assertStatus(200); 
+        
+        //Confirm that the string is not truncated due to DB constraints.
+        $json = $res->json();
+        $this->assertEquals(255, strlen($json['data']['name']));
+    }
+    
+    /** @test */
+    public function update_image_length_0_will_occur_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 999,
+            'image' => '',
+            'category_id' => $category->id
+        ]);
+    }
+    
+    /** @test */
+    public function update_image_length_1_will_no_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 999,
+            'image' => '1',
+            'category_id' => $category->id
+        ]);
+        $res->assertStatus(200); 
+    }
+    
+    /** @test */
+    public function update_image_length_256_will_occur_validation_error()
+    {
+        //first, confirm strlen is 256
+        $this->assertEquals(256, strlen(self::STR256));
+        
+        //then, confirm exception is occured
+        $category =  factory(Category::class)->create();
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 999,
+            'image' => self::STR256,
+            'category_id' => $category->id
+        ]);
+    }
+    
+    /** @test */
+    public function update_image_length_255_will_no_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 999,
+            'image' => self::STR255,
+            'category_id' => $category->id
+        ]);
+        $res->assertStatus(200); 
+        
+        //Confirm that the string is not truncated due to DB constraints.
+        $json = $res->json();
+        $this->assertEquals(255, strlen($json['data']['image']));
+    }
+    
+    /** @test */
+    public function update_price_minus1_will_occur_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $this->expectException(ValidationException::class);
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => -1,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+        ]);
+    }
+    
+    /** @test */
+    public function update_price_0_will_no_validation_error()
+    {
+        $category =  factory(Category::class)->create();
+        $row = factory(Item::class)->create();
+        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+            'name' => 'item1',
+            'price' => 0,
+            'image' => 'item1.png',
+            'category_id' => $category->id
+        ]);
+        $res->assertStatus(200); 
     }
     
     //=========================================================================
