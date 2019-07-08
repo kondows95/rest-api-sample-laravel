@@ -187,7 +187,7 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function show_notExistsId_will_occur_error()
+    public function show_deletedId_will_occur_error()
     {
         $row = factory(Item::class)->create();
         $row->delete();
@@ -198,7 +198,7 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function show_deletedId_will_occur_error()
+    public function show_notExistsId_will_occur_error()
     {
         $row = factory(Item::class)->create();
         $errorId = $row->id + 1;

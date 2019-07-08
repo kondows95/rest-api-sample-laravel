@@ -110,7 +110,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function show_notExistsId_will_occur_error()
+    public function show_deletedId_will_occur_error()
     {
         $row = factory(Category::class)->create();
         $row->delete();
@@ -121,7 +121,7 @@ class CategoryTest extends TestCase
     }
     
     /** @test */
-    public function show_deletedId_will_occur_error()
+    public function show_notExistsId_will_occur_error()
     {
         $row = factory(Category::class)->create();
         $errorId = $row->id + 1;
