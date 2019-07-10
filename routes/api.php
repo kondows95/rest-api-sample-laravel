@@ -25,4 +25,8 @@ Route::group([], function () {
     Route::apiResource('items', 'ItemsController');
     Route::apiResource('categories', 'CategoriesController');
     Route::apiResource('orders', 'OrdersController')->only(['store']);
+    Route::post('posttest', function (Request $request) {
+        $data = $request->all();
+        return response()->json($data);
+    });
 });
