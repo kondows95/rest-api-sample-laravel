@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\CognitoJWT;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +28,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Auth::viaRequest('cognito', function ($request) {
+            $jwt = $request->bearerToken();
+            $region = env('AWS_REGION');
+            $userPoolId = env('AWS_COGNITO_USER_POOL_ID');
+            if ($jwt) {
+                return CognitoJWT::verifyToken($jwt, $region, $userPoolId);
+            }
+            return null;
+        });
     }
 }
