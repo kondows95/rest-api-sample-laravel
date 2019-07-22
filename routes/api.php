@@ -13,8 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:api')->group(function () {
+    Route::get('/autheduser', function () {
+        return response()->json(auth()->user());
+    });
+    
+    Route::apiResource('items', 'ItemsController');
 });
 
 Route::group([], function () {
@@ -22,7 +26,7 @@ Route::group([], function () {
         return "This endpoint is no problem.";
     });
     
-    Route::apiResource('items', 'ItemsController');
+    
     Route::apiResource('categories', 'CategoriesController');
     Route::apiResource('orders', 'OrdersController')->only(['store']);
     Route::post('posttest', function (Request $request) {
@@ -30,3 +34,4 @@ Route::group([], function () {
         return response()->json($data);
     });
 });
+
