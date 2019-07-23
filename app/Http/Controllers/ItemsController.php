@@ -42,7 +42,12 @@ class ItemsController extends Controller
     //However, if there are items that can not be changed, you need to create UpdateItemRequest.
     public function update(StoreItemRequest $request, Item $item): JsonResource
     {
+        echo 'BEFOR_ITEM=';
+        var_dump($item->toArray());
+        var_dump($request->validated());
         $item->update($request->validated());
+         echo 'AFTER_ITEM=';
+        var_dump($item->toArray());
         return new JsonResource($item);
     }
     

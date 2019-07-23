@@ -19,19 +19,19 @@ Route::middleware('auth:api')->group(function () {
     });
     
     Route::apiResource('items', 'ItemsController');
-});
-
-Route::group([], function () {
-    Route::get('/', function () {
-        return "This endpoint is no problem.";
-    });
-    
     
     Route::apiResource('categories', 'CategoriesController');
+    
     Route::apiResource('orders', 'OrdersController')->only(['store']);
+    
     Route::post('posttest', function (Request $request) {
         $data = $request->all();
         return response()->json($data);
     });
 });
+
+Route::get('/', function () {
+    return "public endpoint";
+});
+
 

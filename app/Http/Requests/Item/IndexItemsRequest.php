@@ -24,7 +24,7 @@ class IndexItemsRequest extends FormRequest
     public function rules()
     {
         return [
-            'offset' => 'integer|min:0'
+            'offset' => 'integer|min:0|nullable'
         ];
     }
 }

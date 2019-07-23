@@ -27,7 +27,7 @@ class StoreItemRequest extends FormRequest
             'category_id' => 'required|integer|min:1',
             'name' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
-            'image' => 'string|max:255',
+            'image' => 'string|max:255|nullable',
         ];
     }
 }
