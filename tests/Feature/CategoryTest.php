@@ -27,8 +27,8 @@ class CategoryTest extends TestCase
     public function on_index_categories_success()
     {
         $exps = factory(Category::class, 2)->create();
- 
-        $res = $this->json('GET', self::API_PATH); 
+
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH);
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -56,7 +56,7 @@ class CategoryTest extends TestCase
         factory(Category::class)->create(['id' => 1250]);
         factory(Category::class)->create(['id' => 8]);
         factory(Category::class)->create(['id' => 35]);
-        $res = $this->json('GET', self::API_PATH); 
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH); 
         $res->assertStatus(200);
         $res->assertJsonCount(3, 'data');
         $res->assertJson([
@@ -77,7 +77,7 @@ class CategoryTest extends TestCase
         $row3 = factory(Category::class)->create();
        
         
-        $res = $this->json('GET', self::API_PATH); 
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH); 
         $res->assertStatus(200);
         $res->assertJsonCount(2, 'data');
         $res->assertJson([
@@ -96,7 +96,7 @@ class CategoryTest extends TestCase
     {
         $exps = factory(Category::class, 3)->create();
         
-        $res = $this->json('GET', self::API_PATH.'/'.$exps[1]->id); 
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH.'/'.$exps[1]->id); 
         $res->assertStatus(200); 
         $res->assertExactJson([
             'data' => [
@@ -117,7 +117,7 @@ class CategoryTest extends TestCase
         
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$row->id);
-        $res = $this->json('GET', self::API_PATH.'/'.$row->id); 
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH.'/'.$row->id); 
     }
     
     /** @test */
@@ -128,7 +128,7 @@ class CategoryTest extends TestCase
         
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [App\Models\Category] '.$errorId);
-        $res = $this->json('GET', self::API_PATH.'/'.$errorId); 
+        $res = $this->withHeaders($this->getAuthHeader())->json('GET', self::API_PATH.'/'.$errorId); 
     }
     
     //=========================================================================
@@ -139,7 +139,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function on_store_category_success()
     {
-        $res = $this->json('POST', self::API_PATH, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => 'category1'
         ]);
         $res->assertStatus(201);
@@ -162,14 +162,14 @@ class CategoryTest extends TestCase
     public function store_without_postData_will_occur_validation_error()
     {
         $this->expectException(ValidationException::class);
-        $res = $this->json('POST', self::API_PATH);
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH);
     }
     
     /** @test */
     public function store_name_length_0_will_occur_validation_error()
     {
         $this->expectException(ValidationException::class);
-        $res = $this->json('POST', self::API_PATH, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => ''
         ]);
     }
@@ -177,7 +177,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function store_name_length_1_will_no_validation_error()
     {
-        $res = $this->json('POST', self::API_PATH, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => '1'
         ]);
         $res->assertStatus(201); 
@@ -191,7 +191,7 @@ class CategoryTest extends TestCase
         
         //then, confirm exception is occured
         $this->expectException(ValidationException::class);
-        $res = $this->json('POST', self::API_PATH, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => self::STR256
         ]);
     }
@@ -199,7 +199,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function store_name_length_255_will_no_validation_error()
     {
-        $res = $this->json('POST', self::API_PATH, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => self::STR255
         ]);
         $res->assertStatus(201); 
@@ -218,7 +218,7 @@ class CategoryTest extends TestCase
     public function on_update_category_success()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => 'editedCategory'
         ]);
         $res->assertStatus(200);
@@ -243,7 +243,7 @@ class CategoryTest extends TestCase
     public function update_name_length_1_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => '1'
         ]);
         $res->assertStatus(200); 
@@ -258,7 +258,7 @@ class CategoryTest extends TestCase
         //then, confirm exception is occured
         $this->expectException(ValidationException::class);
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => self::STR256
         ]);
     }
@@ -267,7 +267,7 @@ class CategoryTest extends TestCase
     public function update_name_length_255_will_no_validation_error()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('PUT', self::API_PATH.'/'.$row->id, [
+        $res = $this->withHeaders($this->getAuthHeader())->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => self::STR255
         ]);
         $res->assertStatus(200); 
@@ -286,7 +286,7 @@ class CategoryTest extends TestCase
     public function on_destory_category_success()
     {
         $row = factory(Category::class)->create();
-        $res = $this->json('DELETE', self::API_PATH.'/'.$row->id);
+        $res = $this->withHeaders($this->getAuthHeader())->json('DELETE', self::API_PATH.'/'.$row->id);
         $res->assertStatus(204);
         $this->assertSoftDeleted('categories', ['id' => $row->id]);
     }
