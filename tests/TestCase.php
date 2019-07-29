@@ -52,12 +52,10 @@ abstract class TestCase extends BaseTestCase
         return self::toMySqlDateFromTime(strtotime($strJsonDate));
     }
     
-    function getAuthPayload()
+    function getDummyDecodedJwt($time)
     {
-        $time = time();
-        
         $header = [
-            "kid" => uniqid(),
+            "kid" => 'testKid0123456789=',
             "alg" => "RS256"
         ];
         
@@ -78,8 +76,12 @@ abstract class TestCase extends BaseTestCase
         return [$header, $payload];
     }
     
-    function getAuthHeader()
+    function getAuthHeader($time=null)
     {
+        if (is_null($time)) {
+            $time = time();
+        }
+        
         //create key pair.
         $key = openssl_pkey_new();
         
@@ -93,7 +95,7 @@ abstract class TestCase extends BaseTestCase
         $publicKey = $keyDetails['key'];
         
         //get payload.
-        list($header, $payload) = $this->getAuthPayload();
+        list($header, $payload) = $this->getDummyDecodedJwt($time);
         
         //insert DB tabale row.
         PublicKey::create(['kid' => $header['kid'], 'public_key' => $publicKey]);
