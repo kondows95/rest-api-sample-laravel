@@ -30,8 +30,8 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::viaRequest('cognito', function ($request) {
             $jwt = $request->bearerToken();
-            $region = env('AWS_REGION');
-            $userPoolId = env('AWS_COGNITO_USER_POOL_ID');
+            $region = env('AWS_REGION', '');//must be string
+            $userPoolId = env('AWS_COGNITO_USER_POOL_ID', '');//must be string
             if ($jwt) {
                 return CognitoJWT::verifyToken($jwt, $region, $userPoolId);
             }
