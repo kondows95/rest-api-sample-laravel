@@ -328,26 +328,12 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function store_image_length_0_will_occur_validation_error()
-    {
-        $category =  factory(Category::class)->create();
-        $this->expectException(ValidationException::class);
-        $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
-            'name' => 'item1',
-            'price' => 999,
-            'image' => '',
-            'category_id' => $category->id
-        ]);
-    }
-    
-    /** @test */
-    public function store_image_length_1_will_no_validation_error()
+    public function store_image_length_0_is_nullable()
     {
         $category =  factory(Category::class)->create();
         $res = $this->withHeaders($this->getAuthHeader())->json('POST', self::API_PATH, [
             'name' => 'item1',
             'price' => 999,
-            'image' => '1',
             'category_id' => $category->id
         ]);
         $res->assertStatus(201); 
@@ -544,17 +530,16 @@ class ItemTest extends TestCase
     }
     
     /** @test */
-    public function update_image_length_0_will_occur_validation_error()
+    public function update_image_is_nullable()
     {
         $category =  factory(Category::class)->create();
-        $this->expectException(ValidationException::class);
         $row = factory(Item::class)->create();
         $res = $this->withHeaders($this->getAuthHeader())->json('PUT', self::API_PATH.'/'.$row->id, [
             'name' => 'item1',
             'price' => 999,
-            'image' => '',
             'category_id' => $category->id
         ]);
+        $res->assertStatus(200); 
     }
     
     /** @test */
